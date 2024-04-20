@@ -54,7 +54,7 @@ class PostController extends Controller
     public function getPostDetail($postId)
     {
         // Find the post by ID
-        $post = Post::find($postId);
+        $post = Post::with('user')->find($postId);
 
         // Check if the post exists
         if (!$post) {
@@ -64,4 +64,37 @@ class PostController extends Controller
         // Return the post as JSON
         return response()->json($post);
     }
+
+    // Method to delete a post by ID
+    public function deletePost($postId)
+    {
+        // Find the post by ID
+        $post = Post::find($postId);
+
+        // Check if the post exists
+        if (!$post) {
+            return response()->json(['message' => 'Post not found'], 404);
+        }
+
+        // Check if the authenticated user owns the post
+        if ($post->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Delete the post
+        $post->delete();
+
+        // Return success message
+        return response()->json(['message' => 'Post deleted successfully']);
+    }
+
+     // Method to fetch all posts
+     public function getPosts(Request $request)
+     {
+         // You can add logic here to paginate or sort posts if necessary
+         $posts = Post::latest()->get(); // Fetch all posts sorted by most recent first
+ 
+         // Return the posts as JSON
+         return response()->json($posts);
+     }
 }
