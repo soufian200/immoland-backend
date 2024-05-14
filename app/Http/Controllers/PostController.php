@@ -97,4 +97,15 @@ class PostController extends Controller
          // Return the posts as JSON
          return response()->json($posts);
      }
+
+     public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        $results = Post::where('title', 'like', "%$query%")
+                        ->orWhere('description', 'like', "%$query%")
+                        ->get();
+
+        return response()->json($results);
+    }
 }
